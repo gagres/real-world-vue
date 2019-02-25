@@ -10,6 +10,7 @@ import EventShow from './views/EventShow.vue'
 import User from './views/User.vue';
 import NotFound from '@/views/NotFound.vue';
 import NetworkIssue from './views/NetworkIssue.vue';
+import Example from './views/Example.vue';
 
 Vue.use(Router);
 
@@ -17,6 +18,11 @@ const router = new Router({
   mode: "history",
   base: process.env.BASE_URL,
   routes: [
+    {
+      path: '/example',
+      name: 'example',
+      component: Example
+    },
     {
       path: "/",
       name: "event-list",
