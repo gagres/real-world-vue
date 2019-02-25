@@ -5,7 +5,8 @@ export const namespaced = true;
 export const state = {
     events: [],
     totalEvents: 0,
-    event: {}
+    event: {},
+    perPage: 3
 }
 export const mutations = {
     ADD_EVENT(state, event) {
@@ -48,8 +49,8 @@ export const actions = {
           throw error;
         })
     },
-    fetchEvents({ commit, dispatch }, { perPage, page }) {
-      EventService.getEvents(perPage, page)
+    fetchEvents({ commit, dispatch, state }, { page }) {
+      return EventService.getEvents(state.perPage, page)
         .then(response => {
           commit('SET_EVENTS', response.data);
           commit('SET_TOTAL_EVENTS', response.headers['x-total-count']);
@@ -63,25 +64,18 @@ export const actions = {
           dispatch('notification/add', notification, { root: true }); // Using an action of another module
         });
     },
-    fetchEvent({ commit, dispatch, getters }, id) {
+    fetchEvent({ commit, getters }, id) {
       const event = getters.getEventById(id);
 
       if (event) {
         commit('SET_EVENT', event);
-      } else {
-        EventService.getEvent(id)
-          .then(response => {
-            commit('SET_EVENT', response.data);
-          })
-          .catch(error => {
-            const notification = {
-              type: 'error',
-              message: 'There was an error fetching event:' + error.message
-            }
-
-            dispatch('notification/add', notification, { root: true });
-          });
+        return event;
       }
+      return EventService.getEvent(id)
+        .then(response => {
+          commit('SET_EVENT', response.data);
+          return response.data;
+        })
     }
 }
 

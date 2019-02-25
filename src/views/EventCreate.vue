@@ -2,35 +2,27 @@
     <div>
         <h1>Create an Event</h1>
         <form @submit.prevent="createEvent">
-          <label>Select a category</label>
-          <select v-model="event.category">
-            <option v-for="cat in categories" :key="cat">{{ cat }}</option>
-          </select>
+          <BaseSelect label="Select a category" :options="categories" 
+            v-model="event.category" class="field"/>
           <h3>Name & describe your event</h3>
-          <div class="field">
+          <!-- <div class="field">
             <label>Title</label>
             <input v-model="event.title" type="text" placeholder="Add an event title"/>
-          </div>
-          <div class="field">
-            <label>Description</label>
-            <input v-model="event.description" type="text" placeholder="Add a description"/>
-          </div>
+          </div> -->
+          <BaseInput label="Title" v-model="event.title" type="text" placeholder="Title"
+            class="field"/>
+          <BaseInput label="Description" v-model="event.description" type="text" placeholder="Description"
+            class="field"/>
           <h3>Where is your event?</h3>
-          <div class="field">
-            <label>Location</label>
-            <input v-model="event.location" type="text" placeholder="Add a location"/>
-          </div>
+          <BaseInput label="Location" v-model="event.location" type="text" placeholder="Add a location"
+            class="field"/>
           <h3>When is your event?</h3>
           <div class="field">
             <label>Date</label>
             <DatePicker v-model="event.date" placeholder="Select a date"/>
           </div>
-          <div class="field">
-            <label>Select a time</label>
-            <select v-model="event.time">
-              <option v-for="time in times" :key="time">{{ time }}</option>
-            </select>
-          </div>
+          <BaseSelect label="Select a time" :options="times" 
+            v-model="event.time" class="field"/>
           <input type="submit" class="button -fill-gradient" value="Submit"/>
         </form>
     </div>
@@ -38,6 +30,7 @@
 
 <script>
 import DatePicker from 'vuejs-datepicker'
+import NProgress from 'nprogress'
 
 export default {
     components: {
@@ -56,22 +49,23 @@ export default {
     },
     methods: {
         createEvent() {
-            this.$store.dispatch('event/createEvent', this.event)
-                .then(() => {
-                    this.$router.push({
-                        name: 'event-show',
-                        params: { id: this.event.id }
-                    })
-                    this.event = this.createFreshEventObject();
+          NProgress.start()
+          this.$store.dispatch('event/createEvent', this.event)
+              .then(() => {
+                this.$router.push({
+                  name: 'event-show',
+                  params: { id: this.event.id }
                 })
-                .catch(() => {})
+                this.event = this.createFreshEventObject();
+              })
+              .catch(() => {})
         },
         createFreshEventObject() {
             const user = this.$store.state.user.user;
-            const id = Math.floor(Math.random * 1000000);
+            const id = Math.floor(Math.random() * 1000000);
 
             return {
-                id: id,
+                id,
                 user,
                 category: '',
                 organizer: user,
